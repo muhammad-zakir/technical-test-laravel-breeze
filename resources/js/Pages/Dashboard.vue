@@ -7,7 +7,7 @@ import {
     Col as ACol,
     Row as ARow,
     Statistic as AStatistic,
-    Typography,
+    Typography
 } from 'ant-design-vue';
 import { computed } from 'vue';
 

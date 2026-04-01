@@ -6,7 +6,7 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     TeamOutlined,
-    UserOutlined,
+    UserOutlined
 } from '@ant-design/icons-vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
 import {
@@ -19,7 +19,7 @@ import {
     LayoutContent as ALayoutContent,
     Menu as AMenu,
     MenuItem as AMenuItem,
-    message,
+    message
 } from 'ant-design-vue';
 import { ref, computed } from 'vue';
 
