@@ -1,198 +1,138 @@
 <script setup>
-import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import {
+    BankOutlined,
+    DashboardOutlined,
+    LogoutOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    TeamOutlined,
+    UserOutlined,
+} from '@ant-design/icons-vue';
+import { Link, usePage, router } from '@inertiajs/vue3';
+import {
+    Avatar as AAvatar,
+    Button as AButton,
+    Dropdown as ADropdown,
+    Layout as ALayout,
+    LayoutHeader as ALayoutHeader,
+    LayoutSider as ALayoutSider,
+    LayoutContent as ALayoutContent,
+    Menu as AMenu,
+    MenuItem as AMenuItem,
+    message,
+} from 'ant-design-vue';
+import { ref, computed } from 'vue';
 
-const showingNavigationDropdown = ref(false);
+const page = usePage();
+const collapsed = ref(false);
+
+const user = computed(() => page.props.auth.user);
+const isAdmin = computed(() => user.value?.role === 'admin');
+const flash = computed(() => page.props.flash);
+
+if (flash.value?.success) {
+    message.success(flash.value.success);
+}
+
+const selectedKeys = computed(() => {
+    const url = page.url;
+    if (url.startsWith('/companies')) return ['companies'];
+    if (url.startsWith('/employees')) return ['employees'];
+    if (url.startsWith('/dashboard')) return ['dashboard'];
+    return ['dashboard'];
+});
+
+const handleMenuClick = ({ key }) => {
+    router.visit(route(key === 'dashboard' ? 'dashboard' : `${key}.index`));
+};
+
+const handleLogout = () => {
+    router.post(route('logout'));
+};
 </script>
 
 <template>
-    <div>
-        <div class="min-h-screen bg-gray-100">
-            <nav
-                class="border-b border-gray-100 bg-white"
-            >
-                <!-- Primary Navigation Menu -->
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="flex h-16 justify-between">
-                        <div class="flex">
-                            <!-- Logo -->
-                            <div class="flex shrink-0 items-center">
-                                <Link :href="route('dashboard')">
-                                    <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-gray-800"
-                                    />
-                                </Link>
-                            </div>
-
-                            <!-- Navigation Links -->
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                            >
-                                <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                        </div>
-
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center">
-                            <!-- Settings Dropdown -->
-                            <div class="relative ms-3">
-                                <Dropdown align="right" width="48">
-                                    <template #trigger>
-                                        <span class="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {{ $page.props.auth.user.name }}
-
-                                                <svg
-                                                    class="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fill-rule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clip-rule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </template>
-
-                                    <template #content>
-                                        <DropdownLink
-                                            :href="route('profile.edit')"
-                                        >
-                                            Profile
-                                        </DropdownLink>
-                                        <DropdownLink
-                                            :href="route('logout')"
-                                            method="post"
-                                            as="button"
-                                        >
-                                            Log Out
-                                        </DropdownLink>
-                                    </template>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <!-- Hamburger -->
-                        <div class="-me-2 flex items-center sm:hidden">
-                            <button
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
-                                class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    class="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        :class="{
-                                            hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        :class="{
-                                            hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
+    <ALayout class="min-h-screen">
+        <ALayoutSider
+            v-model:collapsed="collapsed"
+            :trigger="null"
+            collapsible
+            class="!bg-[#001529]"
+            breakpoint="lg"
+            collapsed-width="80"
+        >
+            <div class="flex items-center justify-center h-16 px-4">
+                <Link :href="route('dashboard')" class="flex items-center gap-2 no-underline">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">GR</span>
                     </div>
-                </div>
+                    <span v-if="!collapsed" class="text-white font-semibold text-lg whitespace-nowrap">
+                        GR Tech
+                    </span>
+                </Link>
+            </div>
 
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{
-                        block: showingNavigationDropdown,
-                        hidden: !showingNavigationDropdown,
-                    }"
-                    class="sm:hidden"
+            <AMenu
+                :selected-keys="selectedKeys"
+                theme="dark"
+                mode="inline"
+                @click="handleMenuClick"
+            >
+                <AMenuItem key="dashboard">
+                    <DashboardOutlined />
+                    <span>Dashboard</span>
+                </AMenuItem>
+                <AMenuItem v-if="isAdmin" key="companies">
+                    <BankOutlined />
+                    <span>Companies</span>
+                </AMenuItem>
+                <AMenuItem v-if="isAdmin" key="employees">
+                    <TeamOutlined />
+                    <span>Employees</span>
+                </AMenuItem>
+            </AMenu>
+        </ALayoutSider>
+
+        <ALayout>
+            <ALayoutHeader class="!bg-white !px-6 flex items-center justify-between shadow-sm" style="padding: 0 24px;">
+                <AButton
+                    type="text"
+                    @click="collapsed = !collapsed"
+                    class="!flex !items-center !justify-center"
                 >
-                    <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
+                    <MenuUnfoldOutlined v-if="collapsed" />
+                    <MenuFoldOutlined v-else />
+                </AButton>
+
+                <ADropdown placement="bottomRight">
+                    <div class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                        <AAvatar class="!bg-blue-500">
+                            <template #icon><UserOutlined /></template>
+                        </AAvatar>
+                        <span class="text-gray-700 font-medium hidden sm:inline">{{ user?.name }}</span>
                     </div>
+                    <template #overlay>
+                        <AMenu>
+                            <AMenuItem key="role" disabled>
+                                <span class="text-xs text-gray-400 uppercase">{{ user?.role }}</span>
+                            </AMenuItem>
+                            <a-menu-divider />
+                            <AMenuItem key="logout" @click="handleLogout" class="!text-red-500">
+                                <LogoutOutlined />
+                                <span class="ml-2">Log Out</span>
+                            </AMenuItem>
+                        </AMenu>
+                    </template>
+                </ADropdown>
+            </ALayoutHeader>
 
-                    <!-- Responsive Settings Options -->
-                    <div
-                        class="border-t border-gray-200 pb-1 pt-4"
-                    >
-                        <div class="px-4">
-                            <div
-                                class="text-base font-medium text-gray-800"
-                            >
-                                {{ $page.props.auth.user.name }}
-                            </div>
-                            <div class="text-sm font-medium text-gray-500">
-                                {{ $page.props.auth.user.email }}
-                            </div>
-                        </div>
+            <div v-if="$slots.header" class="bg-white border-b border-gray-200 px-6 py-4">
+                <slot name="header" />
+            </div>
 
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                :href="route('logout')"
-                                method="post"
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Page Heading -->
-            <header
-                class="bg-white shadow"
-                v-if="$slots.header"
-            >
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="header" />
-                </div>
-            </header>
-
-            <!-- Page Content -->
-            <main>
+            <ALayoutContent class="m-6">
                 <slot />
-            </main>
-        </div>
-    </div>
+            </ALayoutContent>
+        </ALayout>
+    </ALayout>
 </template>
